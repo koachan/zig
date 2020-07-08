@@ -116,6 +116,11 @@ fn _start() callconv(.Naked) noreturn {
                 : [argc] "=r" (-> [*]usize)
             );
         },
+        .powerpc64 => {
+            starting_stack_ptr = asm (""
+                : [argc] "={%r1}" (-> [*]usize)
+            );
+        },
         else => @compileError("unsupported arch"),
     }
     // If LLVM inlines stack variables into _start, they will overwrite
