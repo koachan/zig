@@ -162,7 +162,7 @@ pub fn setThreadPointer(addr: usize) void {
         },
         .powerpc64 => {
             asm volatile (
-                \\ mr r13, %[addr]
+                \\ mr %%r13, %[addr]
                 :
                 : [addr] "r" (addr)
             );

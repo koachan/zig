@@ -92,7 +92,7 @@ pub const restore = restore_rt;
 pub fn restore_rt() callconv(.Naked) void {
     return asm volatile ("sc"
         :
-        : [number] "{%r0}" (@enumToInt(SYS.rt_sigreturn))
+        : [number] "{r0}" (@enumToInt(SYS.rt_sigreturn))
         : "memory"
     );
 }
