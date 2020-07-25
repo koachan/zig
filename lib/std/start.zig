@@ -118,7 +118,7 @@ fn _start() callconv(.Naked) noreturn {
         },
         .powerpc64 => {
             starting_stack_ptr = asm (""
-                : [argc] "={%r1}" (-> [*]usize)
+                : [argc] "={r1}" (-> [*]usize)
             );
         },
         else => @compileError("unsupported arch"),
