@@ -389,6 +389,39 @@ fn clone() callconv(.Naked) void {
                 \\  syscall
             );
         },
+        .powerpc64 => {
+            // __clone(func, stack, flags, arg, ptid, tls, ctid)
+            //           r3,    r4,    r5,  r6,   r7,  r8,   r9
+
+            // syscall(SYS_clone, flags, stack, ptid, tls, ctid)
+            //                r0     r3,    r4,   r5,  r6,   r7
+            asm volatile (
+                \\ # Save function pointer and argument pointer on new thread stack
+                \\ std %%r3, 0(%%r1)
+                \\ std %%r6, 8(%%r1)
+                \\
+                \\ # Call SYS_clone
+                \\ li %%r0, 120
+                \\ mr %%r3, %%r5
+                \\ mr %%r5, %%r7
+                \\ mr %%r6, %%r8
+                \\ mr %%r7, %%r9
+                \\ sc
+                \\
+                \\ # Parent
+                \\ cmpwi %%r3, 0
+                \\ beq 1f
+                \\ blr
+                \\
+                \\1: # Child
+                \\ ld %%r4, 0(%%r1)
+                \\ mtctr %%r4
+                \\ ld %%r3, 8(%%r1)
+                \\ bctrl
+                \\ li %%r0, 1
+                \\ sc
+            );
+        },
         else => @compileError("Implement clone() for this arch."),
     }
 }
