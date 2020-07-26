@@ -398,7 +398,7 @@ fn clone() callconv(.Naked) void {
             asm volatile (
                 \\ stdu %%r1, -128(%%r1)
                 \\ mflr %%r0
-                \\ std %%0, 144(%%r1)
+                \\ std %%r0, 144(%%r1)
                 \\
                 \\ # Save function pointer and argument pointer on new thread stack
                 \\ std %%r3, 112(%%r1)
