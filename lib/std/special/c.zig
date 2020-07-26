@@ -396,9 +396,13 @@ fn clone() callconv(.Naked) void {
             // syscall(SYS_clone, flags, stack, ptid, tls, ctid)
             //                r0     r3,    r4,   r5,  r6,   r7
             asm volatile (
+                \\ stdu %%r1, -128(%%r1)
+                \\ mflr %%r0
+                \\ std %%0, 144(%%r1)
+                \\
                 \\ # Save function pointer and argument pointer on new thread stack
-                \\ std %%r3, 0(%%r1)
-                \\ std %%r6, 8(%%r1)
+                \\ std %%r3, 112(%%r1)
+                \\ std %%r6, 120(%%r1)
                 \\
                 \\ # Call SYS_clone
                 \\ li %%r0, 120
@@ -411,12 +415,15 @@ fn clone() callconv(.Naked) void {
                 \\ # Parent
                 \\ cmpwi %%r3, 0
                 \\ beq 1f
+                \\ ld %%r0, 144(%%r1)
+                \\ mtlr %%r0
+                \\ ld %%r1, 0(%%r1)
                 \\ blr
                 \\
                 \\1: # Child
-                \\ ld %%r4, 0(%%r1)
+                \\ ld %%r4, 112(%%r1)
                 \\ mtctr %%r4
-                \\ ld %%r3, 8(%%r1)
+                \\ ld %%r3, 120(%%r1)
                 \\ bctrl
                 \\ li %%r0, 1
                 \\ sc
